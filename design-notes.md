@@ -49,6 +49,8 @@ There needs to a mechanism for searching available rooms for a date range.
 
 * Start date (local date)
 * End date (local date)
+* Number of pets (integer)
+* Handicap accessible (boolean)
 
 ## Booking
 
