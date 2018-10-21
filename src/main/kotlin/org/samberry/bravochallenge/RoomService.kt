@@ -7,4 +7,8 @@ class RoomService(
         roomDatabase[room.roomNumber] = room
         return room
     }
+
+    fun findRoom(roomNumber: String): Room? {
+        return roomDatabase[roomNumber]
+    }
 }
