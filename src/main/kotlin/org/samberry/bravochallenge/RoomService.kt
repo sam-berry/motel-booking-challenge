@@ -11,6 +11,7 @@ class RoomService(
     fun findRooms(reservationRequest: ReservationRequest): Set<Room> {
         return roomDatabase.values
             .filter { it.numberOfBeds == reservationRequest.numberOfBeds }
+            .filter { if (reservationRequest.numberOfPets == 0) true else it.petFriendly }
             .toSet()
     }
 }

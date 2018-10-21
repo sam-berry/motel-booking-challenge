@@ -381,4 +381,34 @@ class ReservationTest {
         )
         reservationService.reserveRoom(request)
     }
+
+    @Test(expected = NoAvailableRoomsException::class)
+    fun `cannot reserve a room with pets if it is not pet friendly`() {
+        val room = baseRoom
+        setUpRoom(room)
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds,
+            numberOfPets = 1
+        )
+        reservationService.reserveRoom(request)
+    }
+
+    @Test
+    fun `can reserve a room with pets if it is pet friendly`() {
+        val room = baseRoom.copy(petFriendly = true)
+        setUpRoom(room)
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds,
+            numberOfPets = 1
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
+    }
 }
