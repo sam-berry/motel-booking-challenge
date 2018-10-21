@@ -1,7 +1,7 @@
 package org.samberry.bravochallenge
 
 class RoomService(
-    private val roomDatabase: MutableMap<String, Room>
+    private val roomDatabase: MutableMap<String, Room> = mutableMapOf()
 ) {
     fun addRoom(room: Room): Room {
         roomDatabase[room.roomNumber] = room
