@@ -43,7 +43,7 @@ A pet fee is the price per pet.
 
 ## Availability Search
 
-There needs to a mechanism for searching available rooms for a date range.
+There needs to a mechanism for searching available rooms for a date range. Specific room numbers do not matter, just how many that fit the criteria. Two rooms with the same criteria are essentially the same to the customer - typically people do not care if they are in room 13 or 14 if they are set up exactly the same.
 
 **Required Information**
 
@@ -54,11 +54,12 @@ There needs to a mechanism for searching available rooms for a date range.
 
 ## Booking
 
-There needs to be a way to book an available room for a period of time.
+There needs to be a way to book an available room for a period of time. Same as availability search, room number is not important here. The system should choose an available room based on the provided criteria.
 
 **Required Information**
 
-* Room number (string)
+* Number of beds (integer)
+* Number of pets (integer)
 * Start date (local date)
 * End date (local date)
 
