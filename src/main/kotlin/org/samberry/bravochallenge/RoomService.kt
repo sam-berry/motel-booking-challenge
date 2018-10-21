@@ -12,6 +12,7 @@ class RoomService(
         return roomDatabase.values
             .filter { it.numberOfBeds == reservationRequest.numberOfBeds }
             .filter { if (reservationRequest.numberOfPets == 0) true else it.petFriendly }
+            .filter { if (reservationRequest.handicapAccessible) it.handicapAccessible else true }
             .toSet()
     }
 }
