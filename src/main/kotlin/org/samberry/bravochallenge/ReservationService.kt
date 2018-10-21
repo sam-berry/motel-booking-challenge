@@ -43,7 +43,6 @@ class ReservationService(
         endDate: LocalDate
     ): Boolean {
         val reservationsForRoom = reservationDatabase[room.roomNumber]
-
         if (reservationsForRoom == null || reservationsForRoom.isEmpty())
             return true
 
@@ -51,9 +50,7 @@ class ReservationService(
         var conflictingReservation: Reservation? = null
         while (conflictingReservation == null && reservationIterator.hasNext()) {
             val reservation = reservationIterator.next()
-            val reservationEndsOnOrAfterRequestStart = !reservation.endDate.isBefore(startDate)
-            val reservationStartsOnOrBeforeRequestEnd = !reservation.startDate.isAfter(endDate)
-            if (reservationEndsOnOrAfterRequestStart && reservationStartsOnOrBeforeRequestEnd)
+            if (!reservation.endDate.isBefore(startDate) && !reservation.startDate.isAfter(endDate))
                 conflictingReservation = reservation
         }
 
