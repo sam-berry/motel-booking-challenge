@@ -146,7 +146,7 @@ class ReservationTest {
     fun `can reserve a room adjacent to the start of another reservation`() {
         val room = baseRoom
         setUpRoom(room)
-        
+
         val existingReservation = Reservation(
             startDate = today.plusDays(2),
             endDate = today.plusDays(3)
@@ -436,6 +436,43 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds,
             handicapAccessible = true
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
+    }
+
+    @Test
+    fun `will prefer booking non-handicap accessible rooms for non-handicap requests`() {
+        val nonHandicapRoomNumber = "A4"
+        setOf(
+            baseRoom.copy(roomNumber = "A1", handicapAccessible = true),
+            baseRoom.copy(roomNumber = "A2", handicapAccessible = true),
+            baseRoom.copy(roomNumber = "A3", handicapAccessible = true),
+            baseRoom.copy(roomNumber = nonHandicapRoomNumber, handicapAccessible = false),
+            baseRoom.copy(roomNumber = "A5", handicapAccessible = true),
+            baseRoom.copy(roomNumber = "A6", handicapAccessible = true)
+        ).forEach { setUpRoom(it) }
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = baseRoom.numberOfBeds
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[nonHandicapRoomNumber]).containsExactly(request.toReservation())
+    }
+
+    @Test
+    fun `will book a handicap accessible room for a non-handicap request if it is the only option`() {
+        val room = baseRoom.copy(handicapAccessible = true)
+        setUpRoom(room)
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds
         )
         reservationService.reserveRoom(request)
 

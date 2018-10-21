@@ -9,10 +9,25 @@ class RoomService(
     }
 
     fun findRooms(reservationRequest: ReservationRequest): Set<Room> {
+        val rooms = queryRooms(reservationRequest)
+        if (rooms.isNotEmpty()) return rooms
+        return queryRooms(reservationRequest, true)
+    }
+
+    private fun queryRooms(
+        reservationRequest: ReservationRequest,
+        allowRoomsWithAmenities: Boolean = false
+    ): Set<Room> {
         return roomDatabase.values
             .filter { it.numberOfBeds == reservationRequest.numberOfBeds }
             .filter { if (reservationRequest.numberOfPets == 0) true else it.petFriendly }
-            .filter { if (reservationRequest.handicapAccessible) it.handicapAccessible else true }
+            .filter {
+                when {
+                    reservationRequest.handicapAccessible -> it.handicapAccessible
+                    allowRoomsWithAmenities -> true
+                    else -> !it.handicapAccessible
+                }
+            }
             .toSet()
     }
 }
