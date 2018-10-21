@@ -6,20 +6,35 @@ class ReservationService(
     private val reservationDatabase: MutableMap<String, SortedSet<Reservation>> = mutableMapOf(),
     private val roomService: RoomService
 ) {
-    fun reserveRoom(reservation: Reservation): Reservation {
-        val roomNumber = reservation.roomNumber
+    fun reserveRoom(reservationRequest: Reservation): Reservation {
+        val roomNumber = reservationRequest.roomNumber
         validateRoomNumber(roomNumber)
 
         val reservationsForRoom = reservationDatabase[roomNumber]
 
-        if (reservationsForRoom == null) {
-            reservationDatabase[roomNumber] = sortedSetOf(reservation)
+        if (reservationsForRoom == null || reservationsForRoom.isEmpty()) {
+            reservationDatabase[roomNumber] = sortedSetOf(reservationRequest)
         } else {
-            reservationsForRoom.add(reservation)
-            reservationDatabase[roomNumber] = reservationsForRoom
+            verifyAvailability(reservationRequest, reservationsForRoom)
+            reservationsForRoom.add(reservationRequest)
         }
 
-        return reservation
+        return reservationRequest
+    }
+
+    private fun verifyAvailability(
+        reservationRequest: Reservation,
+        reservationsForRoom: SortedSet<Reservation>
+    ) {
+        val reservationIterator = reservationsForRoom.iterator()
+        while (reservationIterator.hasNext()) {
+            val reservation = reservationIterator.next()
+            val reservationEndsOnOrAfterRequestStart = !reservation.endDate.isBefore(reservationRequest.startDate)
+            val reservationStartsOnOrBeforeRequestEnd = !reservation.startDate.isAfter(reservationRequest.endDate)
+            if (reservationEndsOnOrAfterRequestStart && reservationStartsOnOrBeforeRequestEnd) {
+                throw ReservationUnavailableException(reservationRequest)
+            }
+        }
     }
 
     private fun validateRoomNumber(roomNumber: String) {

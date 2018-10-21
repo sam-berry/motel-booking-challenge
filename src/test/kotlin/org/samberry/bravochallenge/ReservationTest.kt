@@ -214,4 +214,112 @@ class ReservationTest {
         assertThat(reservationDatabase[roomNumber])
             .containsExactly(existingReservationLeft, requestedReservation, existingReservationRight)
     }
+
+    /**
+     * requested:   |-------------|
+     * existing:           |-------------|
+     *            <------------------------------>
+     * days:        0      1      2      3      4
+     */
+    @Test(expected = ReservationUnavailableException::class)
+    fun `cannot reserve a room that overlaps with the start of another reservation`() {
+        val roomNumber = baseRoom.roomNumber
+
+        roomService.addRoom(baseRoom)
+
+        val existingReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today.plusDays(1),
+            endDate = today.plusDays(2)
+        )
+        reservationService.reserveRoom(existingReservation)
+
+        val requestedReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today,
+            endDate = today.plusDays(1)
+        )
+        reservationService.reserveRoom(requestedReservation)
+    }
+
+    /**
+     * requested:          |-------------|
+     * existing:    |-------------|
+     *            <------------------------------>
+     * days:        0      1      2      3      4
+     */
+    @Test(expected = ReservationUnavailableException::class)
+    fun `cannot reserve a room that overlaps with the end of another reservation`() {
+        val roomNumber = baseRoom.roomNumber
+
+        roomService.addRoom(baseRoom)
+
+        val existingReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today,
+            endDate = today.plusDays(1)
+        )
+        reservationService.reserveRoom(existingReservation)
+
+        val requestedReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today.plusDays(1),
+            endDate = today.plusDays(2)
+        )
+        reservationService.reserveRoom(requestedReservation)
+    }
+
+    /**
+     * requested:          |------|
+     * existing:    |--------------------|
+     *            <------------------------------>
+     * days:        0      1      2      3      4
+     */
+    @Test(expected = ReservationUnavailableException::class)
+    fun `cannot reserve a room that is inside another reservation`() {
+        val roomNumber = baseRoom.roomNumber
+
+        roomService.addRoom(baseRoom)
+
+        val existingReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today,
+            endDate = today.plusDays(2)
+        )
+        reservationService.reserveRoom(existingReservation)
+
+        val requestedReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today.plusDays(1),
+            endDate = today.plusDays(1)
+        )
+        reservationService.reserveRoom(requestedReservation)
+    }
+
+    /**
+     * requested:   |--------------------|
+     * existing:           |------|
+     *            <------------------------------>
+     * days:        0      1      2      3      4
+     */
+    @Test(expected = ReservationUnavailableException::class)
+    fun `cannot reserve a room if another reservation is inside of it`() {
+        val roomNumber = baseRoom.roomNumber
+
+        roomService.addRoom(baseRoom)
+
+        val existingReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today.plusDays(1),
+            endDate = today.plusDays(1)
+        )
+        reservationService.reserveRoom(existingReservation)
+
+        val requestedReservation = Reservation(
+            roomNumber = roomNumber,
+            startDate = today,
+            endDate = today.plusDays(2)
+        )
+        reservationService.reserveRoom(requestedReservation)
+    }
 }
