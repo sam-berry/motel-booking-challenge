@@ -58,10 +58,11 @@ There needs to be a way to book an available room for a period of time. Same as 
 
 **Required Information**
 
-* Number of beds (integer)
-* Number of pets (integer)
 * Start date (local date)
 * End date (local date)
+* Number of beds (integer)
+* Number of pets (integer)
+* Handicap accessible (boolean)
 
 ## Additional Thoughts
 

@@ -10,6 +10,7 @@ class ReservationTest {
     private lateinit var baseRoom: Room
     private lateinit var today: LocalDate
 
+    private lateinit var roomDatabase: MutableMap<String, Room>
     private lateinit var roomService: RoomService
     private lateinit var reservationDatabase: MutableMap<String, SortedSet<Reservation>>
     private lateinit var reservationService: ReservationService
@@ -23,39 +24,58 @@ class ReservationTest {
         )
         today = LocalDate.now()
 
-        roomService = RoomService()
+        roomDatabase = mutableMapOf()
+        roomService = RoomService(roomDatabase)
         reservationDatabase = mutableMapOf()
         reservationService = ReservationService(reservationDatabase, roomService)
     }
 
-    @Test(expected = RuntimeException::class)
-    fun `can not reserve a room if it does not exist`() {
-        roomService.addRoom(baseRoom)
-
-        val reservation = Reservation(
-            roomNumber = baseRoom.roomNumber + "blah",
-            startDate = today,
-            endDate = today.plusDays(2)
+    private fun ReservationRequest.toReservation(): Reservation {
+        return Reservation(
+            startDate = this.checkInDate,
+            endDate = this.checkOutDate.minusDays(1)
         )
-        reservationService.reserveRoom(reservation)
+    }
+
+    private fun setUpRoom(room: Room) {
+        roomDatabase[room.roomNumber] = room
+    }
+
+    private fun setUpReservation(room: Room, reservation: Reservation) {
+        val reservations = reservationDatabase[room.roomNumber]
+        if (reservations == null)
+            reservationDatabase[room.roomNumber] = sortedSetOf(reservation)
+        else
+            reservations.add(reservation)
     }
 
     @Test
     fun `can reserve a room if there are no reservations`() {
-        val roomNumber = baseRoom.roomNumber
+        val room = baseRoom
+        setUpRoom(room)
 
-        roomService.addRoom(baseRoom)
-
-        val reservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today,
-            endDate = today.plusDays(2)
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds
         )
-        val result = reservationService.reserveRoom(reservation)
+        reservationService.reserveRoom(request)
 
-        assertThat(result).isEqualTo(reservation)
-        assertThat(reservationDatabase[roomNumber])
-            .containsExactly(reservation)
+        assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
+    }
+
+    @Test(expected = NoAvailableRoomsException::class)
+    fun `cannot reserve if no rooms match the 'number of beds' criteria`() {
+        val room = baseRoom.copy(numberOfBeds = 1)
+        setUpRoom(room)
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(1),
+            numberOfBeds = room.numberOfBeds + 1
+        )
+
+        reservationService.reserveRoom(request)
     }
 
     /**
@@ -66,26 +86,24 @@ class ReservationTest {
      */
     @Test
     fun `can reserve a room adjacent to the start of another reservation`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
-
+        val room = baseRoom
+        setUpRoom(room)
+        
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today.plusDays(2),
             endDate = today.plusDays(3)
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today.plusDays(1),
-            endDate = today.plusDays(1)
+        val request = ReservationRequest(
+            checkInDate = today.plusDays(1),
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
 
-        assertThat(reservationDatabase[roomNumber])
-            .containsExactly(requestedReservation, existingReservation)
+        assertThat(reservationDatabase[room.roomNumber])
+            .containsExactly(request.toReservation(), existingReservation)
     }
 
     /**
@@ -96,26 +114,24 @@ class ReservationTest {
      */
     @Test
     fun `can reserve a room adjacent to the end of another reservation`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today.plusDays(1),
             endDate = today.plusDays(1)
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today.plusDays(2),
-            endDate = today.plusDays(3)
+        val request = ReservationRequest(
+            checkInDate = today.plusDays(2),
+            checkOutDate = today.plusDays(4),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
 
-        assertThat(reservationDatabase[roomNumber])
-            .containsExactly(existingReservation, requestedReservation)
+        assertThat(reservationDatabase[room.roomNumber])
+            .containsExactly(existingReservation, request.toReservation())
     }
 
     /**
@@ -126,26 +142,24 @@ class ReservationTest {
      */
     @Test
     fun `can reserve a room after another reservation with a gap between`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today,
             endDate = today
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today.plusDays(2),
-            endDate = today.plusDays(3)
+        val request = ReservationRequest(
+            checkInDate = today.plusDays(2),
+            checkOutDate = today.plusDays(4),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
 
-        assertThat(reservationDatabase[roomNumber])
-            .containsExactly(existingReservation, requestedReservation)
+        assertThat(reservationDatabase[room.roomNumber])
+            .containsExactly(existingReservation, request.toReservation())
     }
 
     /**
@@ -156,26 +170,24 @@ class ReservationTest {
      */
     @Test
     fun `can reserve a room before another reservation with a gap between`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today.plusDays(2),
             endDate = today.plusDays(3)
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today,
-            endDate = today
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(1),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
 
-        assertThat(reservationDatabase[roomNumber])
-            .containsExactly(requestedReservation, existingReservation)
+        assertThat(reservationDatabase[room.roomNumber])
+            .containsExactly(request.toReservation(), existingReservation)
     }
 
     /**
@@ -186,33 +198,30 @@ class ReservationTest {
      */
     @Test
     fun `can reserve a room and fill the gap between two existing reservations`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservationLeft = Reservation(
-            roomNumber = roomNumber,
             startDate = today,
             endDate = today
         )
-        reservationService.reserveRoom(existingReservationLeft)
+        setUpReservation(room, existingReservationLeft)
 
         val existingReservationRight = Reservation(
-            roomNumber = roomNumber,
             startDate = today.plusDays(2),
             endDate = today.plusDays(3)
         )
-        reservationService.reserveRoom(existingReservationRight)
+        setUpReservation(room, existingReservationRight)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today.plusDays(1),
-            endDate = today.plusDays(1)
+        val request = ReservationRequest(
+            checkInDate = today.plusDays(1),
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
 
-        assertThat(reservationDatabase[roomNumber])
-            .containsExactly(existingReservationLeft, requestedReservation, existingReservationRight)
+        assertThat(reservationDatabase[room.roomNumber])
+            .containsExactly(existingReservationLeft, request.toReservation(), existingReservationRight)
     }
 
     /**
@@ -221,25 +230,23 @@ class ReservationTest {
      *            <------------------------------>
      * days:        0      1      2      3      4
      */
-    @Test(expected = ReservationUnavailableException::class)
+    @Test(expected = NoAvailableRoomsException::class)
     fun `cannot reserve a room that overlaps with the start of another reservation`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today.plusDays(1),
             endDate = today.plusDays(2)
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today,
-            endDate = today.plusDays(1)
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
     }
 
     /**
@@ -248,25 +255,23 @@ class ReservationTest {
      *            <------------------------------>
      * days:        0      1      2      3      4
      */
-    @Test(expected = ReservationUnavailableException::class)
+    @Test(expected = NoAvailableRoomsException::class)
     fun `cannot reserve a room that overlaps with the end of another reservation`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today,
             endDate = today.plusDays(1)
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today.plusDays(1),
-            endDate = today.plusDays(2)
+        val request = ReservationRequest(
+            checkInDate = today.plusDays(1),
+            checkOutDate = today.plusDays(3),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
     }
 
     /**
@@ -275,25 +280,23 @@ class ReservationTest {
      *            <------------------------------>
      * days:        0      1      2      3      4
      */
-    @Test(expected = ReservationUnavailableException::class)
+    @Test(expected = NoAvailableRoomsException::class)
     fun `cannot reserve a room that is inside another reservation`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today,
             endDate = today.plusDays(2)
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today.plusDays(1),
-            endDate = today.plusDays(1)
+        val request = ReservationRequest(
+            checkInDate = today.plusDays(1),
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
     }
 
     /**
@@ -302,24 +305,22 @@ class ReservationTest {
      *            <------------------------------>
      * days:        0      1      2      3      4
      */
-    @Test(expected = ReservationUnavailableException::class)
+    @Test(expected = NoAvailableRoomsException::class)
     fun `cannot reserve a room if another reservation is inside of it`() {
-        val roomNumber = baseRoom.roomNumber
-
-        roomService.addRoom(baseRoom)
+        val room = baseRoom
+        setUpRoom(room)
 
         val existingReservation = Reservation(
-            roomNumber = roomNumber,
             startDate = today.plusDays(1),
             endDate = today.plusDays(1)
         )
-        reservationService.reserveRoom(existingReservation)
+        setUpReservation(room, existingReservation)
 
-        val requestedReservation = Reservation(
-            roomNumber = roomNumber,
-            startDate = today,
-            endDate = today.plusDays(2)
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(3),
+            numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(requestedReservation)
+        reservationService.reserveRoom(request)
     }
 }
