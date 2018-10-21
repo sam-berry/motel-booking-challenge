@@ -79,6 +79,64 @@ class ReservationTest {
     }
 
     /**
+     * requested:   |-------------|
+     * existing:
+     * existing:    |-------------|
+     *            <------------------------------>
+     * days:        0      1      2      3      4
+     */
+    @Test
+    fun `can reserve if one room is booked but another is not`() {
+        val numberOfBeds = 3
+        val bookedRoom = baseRoom.copy(numberOfBeds = numberOfBeds)
+        setUpRoom(bookedRoom)
+        val availableRoom = baseRoom.copy(roomNumber = "B123", numberOfBeds = numberOfBeds)
+        setUpRoom(availableRoom)
+
+        setUpReservation(bookedRoom, Reservation(
+            startDate = today,
+            endDate = today.plusDays(1)
+        ))
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = numberOfBeds
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[availableRoom.roomNumber]).containsExactly(request.toReservation())
+    }
+
+    /**
+     * requested (2 bed):   |-------------|
+     * existing (1 bed):
+     * existing (2 bed):    |-------------|
+     *                    <------------------------------>
+     * days:                0      1      2      3      4
+     */
+    @Test(expected = NoAvailableRoomsException::class)
+    fun `cannot reserve if one room is booked and a non-matching room is available`() {
+        val numberOfBeds = 2
+        val bookedRoom = baseRoom.copy(numberOfBeds = numberOfBeds)
+        setUpRoom(bookedRoom)
+        val availableRoom = baseRoom.copy(roomNumber = "B123", numberOfBeds = numberOfBeds - 1)
+        setUpRoom(availableRoom)
+
+        setUpReservation(bookedRoom, Reservation(
+            startDate = today,
+            endDate = today.plusDays(1)
+        ))
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = numberOfBeds
+        )
+        reservationService.reserveRoom(request)
+    }
+
+    /**
      * requested:          |------|
      * existing:                  |-------------|
      *            <------------------------------>
