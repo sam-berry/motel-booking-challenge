@@ -31,9 +31,8 @@ class ReservationService(
         var availableRoom: Room? = null
         while (availableRoom == null && roomIterator.hasNext()) {
             val room = roomIterator.next()
-            if (isRoomAvailable(room, startDate, endDate)) {
+            if (isRoomAvailable(room, startDate, endDate))
                 availableRoom = room
-            }
         }
         return availableRoom ?: throw NoAvailableRoomsException()
     }
@@ -54,9 +53,8 @@ class ReservationService(
             val reservation = reservationIterator.next()
             val reservationEndsOnOrAfterRequestStart = !reservation.endDate.isBefore(startDate)
             val reservationStartsOnOrBeforeRequestEnd = !reservation.startDate.isAfter(endDate)
-            if (reservationEndsOnOrAfterRequestStart && reservationStartsOnOrBeforeRequestEnd) {
+            if (reservationEndsOnOrAfterRequestStart && reservationStartsOnOrBeforeRequestEnd)
                 conflictingReservation = reservation
-            }
         }
 
         return conflictingReservation == null
