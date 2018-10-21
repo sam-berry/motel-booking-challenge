@@ -4,7 +4,7 @@
 
 There needs to be a way to add a room to the system so that it is available to book.
 
-*Required Information*
+**Required Information**
 
 * Room number (string) <- must be unique
 * Number of beds (integer)
@@ -16,7 +16,7 @@ There needs to be a way to add a room to the system so that it is available to b
 
 There must be a mechanism that limits the number of pets on a reservation to 2.
 
-*Required Information*
+**Required Information**
 
 * Maximum number of pets allowed (integer)
 
@@ -28,7 +28,7 @@ There needs to be a rule chain for determining pricing. Pricing is based on numb
 
 Base pricing is the base rate for a room based on the number of beds. There needs to be a way to add a base price.
 
-*Required Information*
+**Required Information**
 
 * Number of beds (integer)
 * Price (money)
@@ -37,7 +37,7 @@ Base pricing is the base rate for a room based on the number of beds. There need
 
 A pet fee is the price per pet.
 
-*Required Information*
+**Required Information**
 
 * Fee amount (money)
 
@@ -45,7 +45,7 @@ A pet fee is the price per pet.
 
 There needs to a mechanism for searching available rooms for a date range.
 
-*Required Information*
+**Required Information**
 
 * Start date (local date)
 * End date (local date)
@@ -54,7 +54,7 @@ There needs to a mechanism for searching available rooms for a date range.
 
 There needs to be a way to book an available room for a period of time.
 
-*Required Information*
+**Required Information**
 
 * Room number (string)
 * Start date (local date)
