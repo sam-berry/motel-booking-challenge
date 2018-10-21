@@ -478,4 +478,41 @@ class ReservationTest {
 
         assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
     }
+
+    @Test
+    fun `will prefer booking pet non-friendly rooms for requests with no pets`() {
+        val petNonFriendlyRoomNumber = "A4"
+        setOf(
+            baseRoom.copy(roomNumber = "A1", petFriendly = true),
+            baseRoom.copy(roomNumber = "A2", petFriendly = true),
+            baseRoom.copy(roomNumber = "A3", petFriendly = true),
+            baseRoom.copy(roomNumber = petNonFriendlyRoomNumber, petFriendly = false),
+            baseRoom.copy(roomNumber = "A5", petFriendly = true),
+            baseRoom.copy(roomNumber = "A6", petFriendly = true)
+        ).forEach { setUpRoom(it) }
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = baseRoom.numberOfBeds
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[petNonFriendlyRoomNumber]).containsExactly(request.toReservation())
+    }
+
+    @Test
+    fun `will book a pet friendly room for a request with no pets if it is the only option`() {
+        val room = baseRoom.copy(petFriendly = true)
+        setUpRoom(room)
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
+    }
 }

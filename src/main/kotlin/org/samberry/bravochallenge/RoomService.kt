@@ -20,7 +20,13 @@ class RoomService(
     ): Set<Room> {
         return roomDatabase.values
             .filter { it.numberOfBeds == reservationRequest.numberOfBeds }
-            .filter { if (reservationRequest.numberOfPets == 0) true else it.petFriendly }
+            .filter {
+                when {
+                    reservationRequest.numberOfPets > 0 -> it.petFriendly
+                    allowRoomsWithAmenities -> true
+                    else -> !it.petFriendly
+                }
+            }
             .filter {
                 when {
                     reservationRequest.handicapAccessible -> it.handicapAccessible
