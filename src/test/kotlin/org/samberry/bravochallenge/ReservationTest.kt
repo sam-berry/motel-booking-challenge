@@ -7,8 +7,13 @@ import org.samberry.bravochallenge.api.Reservation
 import org.samberry.bravochallenge.api.ReservationRequest
 import org.samberry.bravochallenge.api.Room
 import org.samberry.bravochallenge.dao.ReservationDAO
+import org.samberry.bravochallenge.dao.ReservationRuleDAO
 import org.samberry.bravochallenge.dao.RoomDAO
 import org.samberry.bravochallenge.exception.NoAvailableRoomsException
+import org.samberry.bravochallenge.exception.TooManyPetsException
+import org.samberry.bravochallenge.reservationrule.MaxPetsRule
+import org.samberry.bravochallenge.reservationrule.ReservationRule
+import org.samberry.bravochallenge.reservationrule.ReservationRuleChain
 import org.samberry.bravochallenge.service.AvailabilitySearchService
 import org.samberry.bravochallenge.service.ReservationService
 import org.samberry.bravochallenge.service.RoomService
@@ -25,6 +30,9 @@ class ReservationTest {
     private lateinit var reservationDatabase: MutableMap<String, SortedSet<Reservation>>
     private lateinit var reservationDAO: ReservationDAO
     private lateinit var availabilitySearchService: AvailabilitySearchService
+    private lateinit var reservationRuleDatabase: MutableSet<ReservationRule>
+    private lateinit var reservationRuleDAO: ReservationRuleDAO
+    private lateinit var reservationRuleChain: ReservationRuleChain
     private lateinit var reservationService: ReservationService
 
     @Before
@@ -41,7 +49,10 @@ class ReservationTest {
         roomService = RoomService(roomDAO)
         reservationDatabase = mutableMapOf()
         reservationDAO = ReservationDAO(reservationDatabase)
-        availabilitySearchService = AvailabilitySearchService(reservationDAO, roomService)
+        reservationRuleDatabase = mutableSetOf()
+        reservationRuleDAO = ReservationRuleDAO(reservationRuleDatabase)
+        reservationRuleChain = ReservationRuleChain(reservationRuleDAO)
+        availabilitySearchService = AvailabilitySearchService(reservationDAO, roomService, reservationRuleChain)
         reservationService = ReservationService(reservationDAO, availabilitySearchService)
     }
 
@@ -568,5 +579,23 @@ class ReservationTest {
         reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[petFriendlyRoom.roomNumber]).containsExactly(request.toReservation())
+    }
+
+    @Test(expected = TooManyPetsException::class)
+    fun `prevents a reservation if too many pets are requested`() {
+        val room = baseRoom.copy(petFriendly = true)
+        setUpRoom(room)
+
+        reservationRuleDatabase.add(MaxPetsRule(
+            maxAllowedPets = 2
+        ))
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = room.numberOfBeds,
+            numberOfPets = 100 // all cats
+        )
+        reservationService.makeReservation(request)
     }
 }

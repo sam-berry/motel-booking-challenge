@@ -5,16 +5,20 @@ import org.samberry.bravochallenge.api.ReservationRequest
 import org.samberry.bravochallenge.api.Room
 import org.samberry.bravochallenge.dao.ReservationDAO
 import org.samberry.bravochallenge.exception.NoAvailableRoomsException
+import org.samberry.bravochallenge.reservationrule.ReservationRuleChain
 import org.springframework.stereotype.Service
 
 @Service
 class AvailabilitySearchService(
     private val reservationDAO: ReservationDAO,
-    private val roomService: RoomService
+    private val roomService: RoomService,
+    private val reservationRuleChain: ReservationRuleChain
 ) {
     fun findAvailableRooms(
         reservationRequest: ReservationRequest
     ): Set<Room> {
+        reservationRuleChain.run(reservationRequest)
+
         val allRooms = roomService.findRooms(reservationRequest)
         val roomIterator = allRooms.iterator()
 
