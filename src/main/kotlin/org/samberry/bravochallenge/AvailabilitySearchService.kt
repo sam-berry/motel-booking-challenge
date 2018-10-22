@@ -4,19 +4,35 @@ class AvailabilitySearchService(
     private val reservationDAO: ReservationDAO,
     private val roomService: RoomService
 ) {
+    fun findAvailableRooms(
+        reservationRequest: ReservationRequest
+    ): Set<Room> {
+        val allRooms = roomService.findRooms(reservationRequest)
+        val roomIterator = allRooms.iterator()
+
+        val availableRooms = mutableSetOf<Room>()
+        while (roomIterator.hasNext()) {
+            val room = roomIterator.next()
+            if (isRoomAvailable(room, reservationRequest))
+                availableRooms.add(room)
+        }
+
+        val roomsExcludingNotNeededAmenities = availableRooms
+            .asSequence()
+            .filterNot { reservationRequest.numberOfPets == 0 && it.petFriendly }
+            .filterNot { !reservationRequest.handicapAccessible && it.handicapAccessible }
+            .toSet()
+
+        return if (roomsExcludingNotNeededAmenities.isNotEmpty())
+            roomsExcludingNotNeededAmenities
+        else
+            availableRooms
+    }
+
     fun findAnAvailableRoom(
         reservationRequest: ReservationRequest
     ): Room {
-        val rooms = roomService.findRooms(reservationRequest)
-
-        val roomIterator = rooms.iterator()
-        var availableRoom: Room? = null
-        while (availableRoom == null && roomIterator.hasNext()) {
-            val room = roomIterator.next()
-            if (isRoomAvailable(room, reservationRequest))
-                availableRoom = room
-        }
-        return availableRoom ?: throw NoAvailableRoomsException()
+        return findAvailableRooms(reservationRequest).firstOrNull() ?: throw NoAvailableRoomsException()
     }
 
     private fun isRoomAvailable(

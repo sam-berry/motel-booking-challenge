@@ -479,6 +479,29 @@ class ReservationTest {
     }
 
     @Test
+    fun `will book a handicap accessible room for a non-handicap request if other options are reserved`() {
+        val handicapRoom = baseRoom.copy(roomNumber = "A1", handicapAccessible = true)
+        setUpRoom(handicapRoom)
+        val nonHandicapRoom = baseRoom.copy(roomNumber = "A2", handicapAccessible = false)
+        setUpRoom(nonHandicapRoom)
+
+        val existingReservation = Reservation(
+            startDate = today,
+            endDate = today.plusDays(1)
+        )
+        setUpReservation(nonHandicapRoom, existingReservation)
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = baseRoom.numberOfBeds
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[handicapRoom.roomNumber]).containsExactly(request.toReservation())
+    }
+
+    @Test
     fun `will prefer booking pet non-friendly rooms for requests with no pets`() {
         val petNonFriendlyRoomNumber = "A4"
         setOf(
@@ -513,5 +536,28 @@ class ReservationTest {
         reservationService.reserveRoom(request)
 
         assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
+    }
+
+    @Test
+    fun `will book a pet friendly room for a request with no pets if other options are reserved`() {
+        val petFriendlyRoom = baseRoom.copy(roomNumber = "A1", petFriendly = true)
+        setUpRoom(petFriendlyRoom)
+        val petNotFriendlyRoom = baseRoom.copy(roomNumber = "A2", petFriendly = false)
+        setUpRoom(petNotFriendlyRoom)
+
+        val existingReservation = Reservation(
+            startDate = today,
+            endDate = today.plusDays(1)
+        )
+        setUpReservation(petNotFriendlyRoom, existingReservation)
+
+        val request = ReservationRequest(
+            checkInDate = today,
+            checkOutDate = today.plusDays(2),
+            numberOfBeds = baseRoom.numberOfBeds
+        )
+        reservationService.reserveRoom(request)
+
+        assertThat(reservationDatabase[petFriendlyRoom.roomNumber]).containsExactly(request.toReservation())
     }
 }

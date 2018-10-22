@@ -55,6 +55,7 @@ There needs to a mechanism for searching available rooms for a date range. Speci
 
 * Start date (local date)
 * End date (local date)
+* Number of beds (integer)
 * Number of pets (integer)
 * Handicap accessible (boolean)
 
