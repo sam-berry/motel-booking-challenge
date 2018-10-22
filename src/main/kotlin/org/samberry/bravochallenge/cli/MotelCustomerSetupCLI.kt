@@ -1,5 +1,7 @@
-package org.samberry.bravochallenge
+package org.samberry.bravochallenge.cli
 
+import org.samberry.bravochallenge.api.Room
+import org.samberry.bravochallenge.service.RoomService
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent
 

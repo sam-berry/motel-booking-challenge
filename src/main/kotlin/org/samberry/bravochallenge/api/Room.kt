@@ -1,4 +1,4 @@
-package org.samberry.bravochallenge
+package org.samberry.bravochallenge.api
 
 data class Room(
     val roomNumber: String,

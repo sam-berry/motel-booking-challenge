@@ -1,12 +1,12 @@
-package org.samberry.bravochallenge
+package org.samberry.bravochallenge.cli
 
+import org.samberry.bravochallenge.service.AvailabilitySearchService
+import org.samberry.bravochallenge.api.ReservationRequest
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellOption
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-private var DATE_FORMAT = DateTimeFormatter.ofPattern("MM/d/yyyy")
 
 @ShellComponent
 class AvailabilitySearchCLI(
@@ -34,5 +34,9 @@ class AvailabilitySearchCLI(
             "No rooms available that match that criteria"
         else
             rooms.joinToString(separator = "\n", transform = { it.toString() })
+    }
+
+    companion object {
+        private var DATE_FORMAT = DateTimeFormatter.ofPattern("MM/d/yyyy")
     }
 }

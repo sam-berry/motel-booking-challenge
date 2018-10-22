@@ -1,5 +1,8 @@
-package org.samberry.bravochallenge
+package org.samberry.bravochallenge.service
 
+import org.samberry.bravochallenge.dao.RoomDAO
+import org.samberry.bravochallenge.api.ReservationRequest
+import org.samberry.bravochallenge.api.Room
 import org.springframework.stereotype.Service
 
 @Service

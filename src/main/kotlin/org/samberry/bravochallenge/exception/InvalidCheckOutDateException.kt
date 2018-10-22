@@ -1,7 +1,7 @@
-package org.samberry.bravochallenge
+package org.samberry.bravochallenge.exception
 
+import org.samberry.bravochallenge.api.ReservationRequest
 import java.lang.RuntimeException
-import java.time.LocalDate
 
 class InvalidCheckOutDateException(
     request: ReservationRequest

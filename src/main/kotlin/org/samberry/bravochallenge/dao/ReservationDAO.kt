@@ -1,5 +1,7 @@
-package org.samberry.bravochallenge
+package org.samberry.bravochallenge.dao
 
+import org.samberry.bravochallenge.api.Reservation
+import org.samberry.bravochallenge.api.Room
 import org.springframework.stereotype.Repository
 import java.util.SortedSet
 

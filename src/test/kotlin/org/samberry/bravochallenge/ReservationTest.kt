@@ -3,6 +3,15 @@ package org.samberry.bravochallenge
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.samberry.bravochallenge.api.Reservation
+import org.samberry.bravochallenge.api.ReservationRequest
+import org.samberry.bravochallenge.api.Room
+import org.samberry.bravochallenge.dao.ReservationDAO
+import org.samberry.bravochallenge.dao.RoomDAO
+import org.samberry.bravochallenge.exception.NoAvailableRoomsException
+import org.samberry.bravochallenge.service.AvailabilitySearchService
+import org.samberry.bravochallenge.service.ReservationService
+import org.samberry.bravochallenge.service.RoomService
 import java.time.LocalDate
 import java.util.SortedSet
 

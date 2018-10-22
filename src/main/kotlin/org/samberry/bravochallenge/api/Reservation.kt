@@ -1,4 +1,4 @@
-package org.samberry.bravochallenge
+package org.samberry.bravochallenge.api
 
 import java.time.LocalDate
 

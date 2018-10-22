@@ -2,6 +2,8 @@ package org.samberry.bravochallenge
 
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.Test
+import org.samberry.bravochallenge.api.ReservationRequest
+import org.samberry.bravochallenge.exception.InvalidCheckOutDateException
 import java.time.LocalDate
 
 class ReservationRequestTest {

@@ -3,6 +3,9 @@ package org.samberry.bravochallenge
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.samberry.bravochallenge.api.Room
+import org.samberry.bravochallenge.dao.RoomDAO
+import org.samberry.bravochallenge.service.RoomService
 
 class AddNewRoomTest {
     private lateinit var baseRoom: Room
