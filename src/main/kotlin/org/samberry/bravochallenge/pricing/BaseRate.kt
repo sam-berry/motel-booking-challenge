@@ -3,6 +3,7 @@ package org.samberry.bravochallenge.pricing
 import org.joda.money.CurrencyUnit
 import org.joda.money.Money
 import org.samberry.bravochallenge.api.ReservationRequest
+import java.time.temporal.ChronoUnit
 
 class BaseRate(
     val rate: Money,
@@ -11,7 +12,9 @@ class BaseRate(
     override fun run(reservationRequest: ReservationRequest): Money {
         return if (numberOfBeds != reservationRequest.numberOfBeds)
             Money.zero(CurrencyUnit.USD)
-        else
-            rate
+        else {
+            val reservationLength = ChronoUnit.DAYS.between(reservationRequest.checkInDate, reservationRequest.checkOutDate)
+            rate.multipliedBy(reservationLength.toDouble(), PRICING_ROUNDING_MODE)
+        }
     }
 }
