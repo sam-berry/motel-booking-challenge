@@ -3,9 +3,11 @@ package org.samberry.bravochallenge.cli
 import org.joda.money.Money
 import org.samberry.bravochallenge.api.Room
 import org.samberry.bravochallenge.dao.PricingRuleDAO
+import org.samberry.bravochallenge.dao.ReservationRuleDAO
 import org.samberry.bravochallenge.pricingrule.BaseRate
 import org.samberry.bravochallenge.pricingrule.PRICING_CURRENCY
 import org.samberry.bravochallenge.pricingrule.PetFee
+import org.samberry.bravochallenge.reservationrule.MaxPetsRule
 import org.samberry.bravochallenge.service.RoomService
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
@@ -13,7 +15,8 @@ import org.springframework.shell.standard.ShellMethod
 @ShellComponent
 class MotelCustomerSetupCLI(
     private val roomService: RoomService,
-    private val pricingRuleDAO: PricingRuleDAO
+    private val pricingRuleDAO: PricingRuleDAO,
+    private val reservationRuleDAO: ReservationRuleDAO
 ) {
     @ShellMethod("Setup rooms for the motel customer")
     fun setupCustomerMotel(): String {
@@ -41,6 +44,10 @@ class MotelCustomerSetupCLI(
             PetFee(fee = Money.of(PRICING_CURRENCY, 20.0))
         )
 
+        val reservationRules = setOf(
+            MaxPetsRule(maxAllowedPets = 2)
+        )
+
         val roomResults = rooms
             .asSequence()
             .map { roomService.addRoom(it) }
@@ -51,6 +58,11 @@ class MotelCustomerSetupCLI(
             .map { pricingRuleDAO.saveRule(it) }
             .joinToString(separator = "\n", transform = { it.toString() })
 
-        return "Successfully setup customer.\n\nRooms:\n$roomResults\n\nPricing rules:\n$pricingResults"
+        val reservationResults = reservationRules
+            .asSequence()
+            .map { reservationRuleDAO.saveRule(it) }
+            .joinToString(separator = "\n", transform = { it.toString() })
+
+        return "Successfully setup customer.\n\nRooms:\n$roomResults\n\nPricing rules:\n$pricingResults\n\nReservation rules:\n$reservationResults"
     }
 }

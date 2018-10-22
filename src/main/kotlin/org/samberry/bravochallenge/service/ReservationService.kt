@@ -2,7 +2,6 @@ package org.samberry.bravochallenge.service
 
 import org.samberry.bravochallenge.api.ReservationRequest
 import org.samberry.bravochallenge.dao.ReservationDAO
-import org.samberry.bravochallenge.reservationrule.ReservationRuleChain
 import org.springframework.stereotype.Service
 
 @Service
