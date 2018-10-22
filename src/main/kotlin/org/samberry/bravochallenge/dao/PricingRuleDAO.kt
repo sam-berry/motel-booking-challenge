@@ -1,6 +1,6 @@
 package org.samberry.bravochallenge.dao
 
-import org.samberry.bravochallenge.pricing.PricingRule
+import org.samberry.bravochallenge.pricingrule.PricingRule
 import org.springframework.stereotype.Repository
 
 @Repository

@@ -2,7 +2,7 @@ package org.samberry.bravochallenge.cli
 
 import org.samberry.bravochallenge.service.AvailabilitySearchService
 import org.samberry.bravochallenge.api.ReservationRequest
-import org.samberry.bravochallenge.pricing.PricingRuleChain
+import org.samberry.bravochallenge.pricingrule.PricingRuleChain
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellOption

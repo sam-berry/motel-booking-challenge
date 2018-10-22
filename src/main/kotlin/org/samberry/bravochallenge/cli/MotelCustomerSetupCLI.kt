@@ -1,12 +1,11 @@
 package org.samberry.bravochallenge.cli
 
-import org.joda.money.CurrencyUnit
 import org.joda.money.Money
 import org.samberry.bravochallenge.api.Room
 import org.samberry.bravochallenge.dao.PricingRuleDAO
-import org.samberry.bravochallenge.pricing.BaseRate
-import org.samberry.bravochallenge.pricing.PRICING_CURRENCY
-import org.samberry.bravochallenge.pricing.PetFee
+import org.samberry.bravochallenge.pricingrule.BaseRate
+import org.samberry.bravochallenge.pricingrule.PRICING_CURRENCY
+import org.samberry.bravochallenge.pricingrule.PetFee
 import org.samberry.bravochallenge.service.RoomService
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent

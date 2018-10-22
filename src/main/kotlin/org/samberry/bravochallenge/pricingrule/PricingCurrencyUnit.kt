@@ -1,4 +1,4 @@
-package org.samberry.bravochallenge.pricing
+package org.samberry.bravochallenge.pricingrule
 
 import org.joda.money.CurrencyUnit
 
