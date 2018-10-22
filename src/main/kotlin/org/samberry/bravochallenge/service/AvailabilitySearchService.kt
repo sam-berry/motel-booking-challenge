@@ -25,6 +25,8 @@ class AvailabilitySearchService(
                 availableRooms.add(room)
         }
 
+        // try to save amenity rooms until they are the only thing left
+        // e.g., if pets aren't coming, try to book a non-pet room
         val roomsExcludingNotNeededAmenities = availableRooms
             .asSequence()
             .filterNot { reservationRequest.numberOfPets == 0 && it.petFriendly }
