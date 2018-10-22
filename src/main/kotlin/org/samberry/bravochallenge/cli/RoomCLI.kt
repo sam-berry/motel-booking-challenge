@@ -2,8 +2,8 @@ package org.samberry.bravochallenge.cli
 
 import org.samberry.bravochallenge.api.Room
 import org.samberry.bravochallenge.service.RoomService
-import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent
+import org.springframework.shell.standard.ShellMethod
 
 @ShellComponent
 class RoomCLI(

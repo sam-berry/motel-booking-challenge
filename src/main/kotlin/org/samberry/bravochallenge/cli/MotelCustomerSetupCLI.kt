@@ -7,8 +7,8 @@ import org.samberry.bravochallenge.pricingrule.BaseRate
 import org.samberry.bravochallenge.pricingrule.PRICING_CURRENCY
 import org.samberry.bravochallenge.pricingrule.PetFee
 import org.samberry.bravochallenge.service.RoomService
-import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent
+import org.springframework.shell.standard.ShellMethod
 
 @ShellComponent
 class MotelCustomerSetupCLI(

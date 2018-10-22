@@ -1,9 +1,9 @@
 package org.samberry.bravochallenge.service
 
-import org.samberry.bravochallenge.dao.ReservationDAO
 import org.samberry.bravochallenge.api.Reservation
 import org.samberry.bravochallenge.api.ReservationRequest
 import org.samberry.bravochallenge.api.Room
+import org.samberry.bravochallenge.dao.ReservationDAO
 import org.samberry.bravochallenge.exception.NoAvailableRoomsException
 import org.springframework.stereotype.Service
 

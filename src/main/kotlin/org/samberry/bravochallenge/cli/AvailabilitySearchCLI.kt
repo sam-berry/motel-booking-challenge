@@ -1,10 +1,10 @@
 package org.samberry.bravochallenge.cli
 
-import org.samberry.bravochallenge.service.AvailabilitySearchService
 import org.samberry.bravochallenge.api.ReservationRequest
 import org.samberry.bravochallenge.pricingrule.PricingRuleChain
-import org.springframework.shell.standard.ShellMethod
+import org.samberry.bravochallenge.service.AvailabilitySearchService
 import org.springframework.shell.standard.ShellComponent
+import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
