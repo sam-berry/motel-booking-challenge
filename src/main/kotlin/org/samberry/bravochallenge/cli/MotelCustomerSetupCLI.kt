@@ -106,6 +106,6 @@ class MotelCustomerSetupCLI(
             .map { roomService.addRoom(it) }
             .joinToString(separator = "\n", transform = { it.toString() })
 
-        return "Successfully setup customer. Results:\n $results"
+        return "Successfully setup customer. Rooms:\n$results"
     }
 }

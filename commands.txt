@@ -1,0 +1,25 @@
+shell:>search-availability --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2 --number-of-pets 1
+Room(roomNumber=A3, numberOfBeds=2, buildingLevel=1, handicapAccessible=true, petFriendly=true)
+Room(roomNumber=A4, numberOfBeds=2, buildingLevel=1, handicapAccessible=true, petFriendly=true)
+shell:>search-availability --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room(roomNumber=B3, numberOfBeds=2, buildingLevel=2, handicapAccessible=false, petFriendly=false)
+Room(roomNumber=B4, numberOfBeds=2, buildingLevel=2, handicapAccessible=false, petFriendly=false)
+shell:>make-reservation --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room successfully reserved
+shell:>search-availability --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room(roomNumber=B4, numberOfBeds=2, buildingLevel=2, handicapAccessible=false, petFriendly=false)
+shell:>make-reservation --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room successfully reserved
+shell:>search-availability --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room(roomNumber=A3, numberOfBeds=2, buildingLevel=1, handicapAccessible=true, petFriendly=true)
+Room(roomNumber=A4, numberOfBeds=2, buildingLevel=1, handicapAccessible=true, petFriendly=true)
+shell:>make-reservation --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room successfully reserved
+shell:>search-availability --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room(roomNumber=A4, numberOfBeds=2, buildingLevel=1, handicapAccessible=true, petFriendly=true)
+shell:>make-reservation --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+Room successfully reserved
+shell:>search-availability --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+No rooms available that match that criteria
+shell:>make-reservation --check-in-date "10/20/2018" --check-out-date "10/21/2018" --number-of-beds 2
+No rooms matching the requested criteria are available

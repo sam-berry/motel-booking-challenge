@@ -67,7 +67,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
     }
@@ -83,7 +83,7 @@ class ReservationTest {
             numberOfBeds = room.numberOfBeds + 1
         )
 
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     /**
@@ -111,7 +111,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[availableRoom.roomNumber]).containsExactly(request.toReservation())
     }
@@ -141,7 +141,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     /**
@@ -166,7 +166,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber])
             .containsExactly(request.toReservation(), existingReservation)
@@ -194,7 +194,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(4),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber])
             .containsExactly(existingReservation, request.toReservation())
@@ -222,7 +222,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(4),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber])
             .containsExactly(existingReservation, request.toReservation())
@@ -250,7 +250,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(1),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber])
             .containsExactly(request.toReservation(), existingReservation)
@@ -284,7 +284,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber])
             .containsExactly(existingReservationLeft, request.toReservation(), existingReservationRight)
@@ -312,7 +312,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     /**
@@ -337,7 +337,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(3),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     /**
@@ -362,7 +362,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     /**
@@ -387,7 +387,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(3),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     @Test(expected = NoAvailableRoomsException::class)
@@ -401,7 +401,7 @@ class ReservationTest {
             numberOfBeds = room.numberOfBeds,
             numberOfPets = 1
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     @Test
@@ -415,7 +415,7 @@ class ReservationTest {
             numberOfBeds = room.numberOfBeds,
             numberOfPets = 1
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
     }
@@ -431,7 +431,7 @@ class ReservationTest {
             numberOfBeds = room.numberOfBeds,
             handicapAccessible = true
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
     }
 
     @Test
@@ -445,7 +445,7 @@ class ReservationTest {
             numberOfBeds = room.numberOfBeds,
             handicapAccessible = true
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
     }
@@ -467,7 +467,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = baseRoom.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[nonHandicapRoomNumber]).containsExactly(request.toReservation())
     }
@@ -482,7 +482,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
     }
@@ -505,7 +505,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = baseRoom.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[handicapRoom.roomNumber]).containsExactly(request.toReservation())
     }
@@ -527,7 +527,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = baseRoom.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[petNonFriendlyRoomNumber]).containsExactly(request.toReservation())
     }
@@ -542,7 +542,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = room.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[room.roomNumber]).containsExactly(request.toReservation())
     }
@@ -565,7 +565,7 @@ class ReservationTest {
             checkOutDate = today.plusDays(2),
             numberOfBeds = baseRoom.numberOfBeds
         )
-        reservationService.reserveRoom(request)
+        reservationService.makeReservation(request)
 
         assertThat(reservationDatabase[petFriendlyRoom.roomNumber]).containsExactly(request.toReservation())
     }
