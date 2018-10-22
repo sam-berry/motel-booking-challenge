@@ -1,13 +1,15 @@
 package org.samberry.bravochallenge.pricing
 
-import org.joda.money.CurrencyUnit
 import org.joda.money.Money
 import org.samberry.bravochallenge.api.ReservationRequest
+import org.samberry.bravochallenge.dao.PricingRuleDAO
+import org.springframework.stereotype.Service
 
-class PricingRuleChain(private vararg val pricingRules: PricingRule) {
+@Service
+class PricingRuleChain(private val pricingRuleDAO: PricingRuleDAO) {
     fun run(reservationRequest: ReservationRequest): Money {
-        return pricingRules
-            .fold(Money.zero(CurrencyUnit.USD))
+        return pricingRuleDAO.getPricingRules()
+            .fold(Money.zero(PRICING_CURRENCY))
             { total, pricingRule -> total.plus(pricingRule.run(reservationRequest)) }
     }
 }

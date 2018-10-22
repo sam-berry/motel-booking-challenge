@@ -6,9 +6,11 @@ import org.joda.money.Money
 import org.junit.Before
 import org.junit.Test
 import org.samberry.bravochallenge.api.ReservationRequest
+import org.samberry.bravochallenge.dao.PricingRuleDAO
 import org.samberry.bravochallenge.pricing.BaseRate
-import org.samberry.bravochallenge.pricing.PRICING_ROUNDING_MODE
+import org.samberry.bravochallenge.pricing.PRICING_CURRENCY
 import org.samberry.bravochallenge.pricing.PetFee
+import org.samberry.bravochallenge.pricing.PricingRule
 import org.samberry.bravochallenge.pricing.PricingRuleChain
 import java.time.LocalDate
 
@@ -16,14 +18,22 @@ class PricingRuleChainTest {
     private lateinit var today: LocalDate
     private lateinit var zeroMoney: Money
 
+    private lateinit var pricingRuleDatabase: MutableSet<PricingRule>
+    private lateinit var pricingRuleDAO: PricingRuleDAO
+    private lateinit var pricingRuleChain: PricingRuleChain
+
     @Before
     fun setUp() {
         today = LocalDate.now()
-        zeroMoney = Money.zero(CurrencyUnit.USD)
+        zeroMoney = Money.zero(PRICING_CURRENCY)
+
+        pricingRuleDatabase = mutableSetOf()
+        pricingRuleDAO = PricingRuleDAO(pricingRuleDatabase)
+        pricingRuleChain = PricingRuleChain(pricingRuleDAO)
     }
 
     private fun money(amount: Double): Money {
-        return Money.of(CurrencyUnit.USD, amount)
+        return Money.of(PRICING_CURRENCY, amount)
     }
 
     @Test
@@ -35,9 +45,7 @@ class PricingRuleChainTest {
             rate = money(50.0)
         )
 
-        val pricingChain = PricingRuleChain(
-            baseRate
-        )
+        pricingRuleDatabase.add(baseRate)
 
         val request = ReservationRequest(
             checkInDate = today,
@@ -45,7 +53,7 @@ class PricingRuleChainTest {
             numberOfBeds = numberOfBeds
         )
 
-        val result = pricingChain.run(request)
+        val result = pricingRuleChain.run(request)
         assertThat(result).isEqualTo(money(100.0))
     }
 
@@ -58,9 +66,7 @@ class PricingRuleChainTest {
             rate = money(50.0)
         )
 
-        val pricingChain = PricingRuleChain(
-            baseRate
-        )
+        pricingRuleDatabase.add(baseRate)
 
         val request = ReservationRequest(
             checkInDate = today,
@@ -68,7 +74,7 @@ class PricingRuleChainTest {
             numberOfBeds = numberOfBeds + 1
         )
 
-        val result = pricingChain.run(request)
+        val result = pricingRuleChain.run(request)
         assertThat(result).isEqualTo(zeroMoney)
     }
 
@@ -76,15 +82,13 @@ class PricingRuleChainTest {
     fun `no base rates results in zero pricing`() {
         val numberOfBeds = 1
 
-        val pricingChain = PricingRuleChain()
-
         val request = ReservationRequest(
             checkInDate = today,
             checkOutDate = today.plusDays(2),
             numberOfBeds = numberOfBeds
         )
 
-        val result = pricingChain.run(request)
+        val result = pricingRuleChain.run(request)
         assertThat(result).isEqualTo(zeroMoney)
     }
 
@@ -101,10 +105,8 @@ class PricingRuleChainTest {
             fee = money(20.0)
         )
 
-        val pricingChain = PricingRuleChain(
-            baseRate,
-            petFee
-        )
+        pricingRuleDatabase.add(baseRate)
+        pricingRuleDatabase.add(petFee)
 
         val request = ReservationRequest(
             checkInDate = today,
@@ -113,7 +115,7 @@ class PricingRuleChainTest {
             numberOfPets = 2
         )
 
-        val result = pricingChain.run(request)
+        val result = pricingRuleChain.run(request)
         assertThat(result).isEqualTo(money(140.0))
     }
 
@@ -135,12 +137,12 @@ class PricingRuleChainTest {
             fee = money(20.0)
         )
 
-        val pricingChain = PricingRuleChain(
+        pricingRuleDatabase.addAll(setOf(
             oneBedRate,
             twoBedRate,
             threeBedRate,
             petFee
-        )
+        ))
 
         val oneBedNoPets = ReservationRequest(
             checkInDate = today,
@@ -160,8 +162,8 @@ class PricingRuleChainTest {
             numberOfPets = 1
         )
 
-        assertThat(pricingChain.run(oneBedNoPets)).isEqualTo(money(100.0))
-        assertThat(pricingChain.run(twoBedsTwoPets)).isEqualTo(money(190.0))
-        assertThat(pricingChain.run(threeBedsOnePet)).isEqualTo(money(200.0))
+        assertThat(pricingRuleChain.run(oneBedNoPets)).isEqualTo(money(100.0))
+        assertThat(pricingRuleChain.run(twoBedsTwoPets)).isEqualTo(money(190.0))
+        assertThat(pricingRuleChain.run(threeBedsOnePet)).isEqualTo(money(200.0))
     }
 }

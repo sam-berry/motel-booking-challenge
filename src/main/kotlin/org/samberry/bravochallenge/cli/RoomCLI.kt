@@ -33,7 +33,7 @@ class RoomCLI(
         val rooms = roomService.getAllRooms()
 
         return if (rooms.isEmpty())
-            "No rooms currently configured"
+            "No rooms currently configured."
         else
             rooms.joinToString(separator = "\n", transform = { it.toString() })
     }

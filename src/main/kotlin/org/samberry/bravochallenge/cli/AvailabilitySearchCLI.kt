@@ -2,6 +2,7 @@ package org.samberry.bravochallenge.cli
 
 import org.samberry.bravochallenge.service.AvailabilitySearchService
 import org.samberry.bravochallenge.api.ReservationRequest
+import org.samberry.bravochallenge.pricing.PricingRuleChain
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellOption
@@ -10,7 +11,8 @@ import java.time.format.DateTimeFormatter
 
 @ShellComponent
 class AvailabilitySearchCLI(
-    private val availabilitySearchService: AvailabilitySearchService
+    private val availabilitySearchService: AvailabilitySearchService,
+    private val pricingRuleChain: PricingRuleChain
 ) {
     @ShellMethod("Query motel availability based on reservation criteria")
     fun searchAvailability(
@@ -29,11 +31,16 @@ class AvailabilitySearchCLI(
         )
 
         val rooms = availabilitySearchService.findAvailableRooms(request)
+        val pricing = pricingRuleChain.run(request)
 
         return if (rooms.isEmpty())
-            "No rooms available that match that criteria"
-        else
-            rooms.joinToString(separator = "\n", transform = { it.toString() })
+            "No rooms available that match that criteria."
+        else {
+            val numberOfRooms = rooms.size
+            val roomDetails = rooms.joinToString(separator = "\n", transform = { it.toString() })
+
+            "There are $numberOfRooms rooms available for $pricing. See room details below.\n$roomDetails"
+        }
     }
 
     companion object {

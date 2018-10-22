@@ -1,16 +1,17 @@
 package org.samberry.bravochallenge.cli
 
-import org.samberry.bravochallenge.service.AvailabilitySearchService
 import org.samberry.bravochallenge.api.ReservationRequest
+import org.samberry.bravochallenge.pricing.PricingRuleChain
 import org.samberry.bravochallenge.service.ReservationService
-import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellComponent
+import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
 import java.time.LocalDate
 
 @ShellComponent
 class ReservationCLI(
-    private val reservationService: ReservationService
+    private val reservationService: ReservationService,
+    private val pricingRuleChain: PricingRuleChain
 ) {
     @ShellMethod("Book a new reservation")
     fun makeReservation(
@@ -28,8 +29,9 @@ class ReservationCLI(
             handicapAccessible = handicapAccessible
         )
 
+        val pricing = pricingRuleChain.run(request)
         reservationService.makeReservation(request)
 
-        return "Room successfully reserved"
+        return "Room successfully reserved. $pricing will be due at the time of arrival."
     }
 }
