@@ -1,7 +1,9 @@
 package org.samberry.bravochallenge
 
+import org.springframework.stereotype.Repository
 import java.util.SortedSet
 
+@Repository
 class ReservationDAO(
     private val reservationDatabase: MutableMap<String, SortedSet<Reservation>> = mutableMapOf()
 ) {

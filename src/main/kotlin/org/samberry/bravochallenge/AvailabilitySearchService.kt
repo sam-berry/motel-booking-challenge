@@ -1,5 +1,8 @@
 package org.samberry.bravochallenge
 
+import org.springframework.stereotype.Service
+
+@Service
 class AvailabilitySearchService(
     private val reservationDAO: ReservationDAO,
     private val roomService: RoomService
