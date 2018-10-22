@@ -11,8 +11,11 @@ class ReservationTest {
     private lateinit var today: LocalDate
 
     private lateinit var roomDatabase: MutableMap<String, Room>
+    private lateinit var roomDAO: RoomDAO
     private lateinit var roomService: RoomService
     private lateinit var reservationDatabase: MutableMap<String, SortedSet<Reservation>>
+    private lateinit var reservationDAO: ReservationDAO
+    private lateinit var availabilitySearchService: AvailabilitySearchService
     private lateinit var reservationService: ReservationService
 
     @Before
@@ -25,16 +28,12 @@ class ReservationTest {
         today = LocalDate.now()
 
         roomDatabase = mutableMapOf()
-        roomService = RoomService(roomDatabase)
+        roomDAO = RoomDAO(roomDatabase)
+        roomService = RoomService(roomDAO)
         reservationDatabase = mutableMapOf()
-        reservationService = ReservationService(reservationDatabase, roomService)
-    }
-
-    private fun ReservationRequest.toReservation(): Reservation {
-        return Reservation(
-            startDate = this.checkInDate,
-            endDate = this.checkOutDate.minusDays(1)
-        )
+        reservationDAO = ReservationDAO(reservationDatabase)
+        availabilitySearchService = AvailabilitySearchService(reservationDAO, roomService)
+        reservationService = ReservationService(reservationDAO, availabilitySearchService)
     }
 
     private fun setUpRoom(room: Room) {

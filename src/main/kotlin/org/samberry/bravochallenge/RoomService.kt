@@ -4,17 +4,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class RoomService(
-    private val roomDatabase: MutableMap<String, Room> = mutableMapOf()
+    private val roomDAO: RoomDAO
 ) {
     fun getAllRooms(): List<Room> {
-        return roomDatabase.values
-            .sortedBy { it.roomNumber }
-            .toList()
+        return roomDAO.getAllRooms()
     }
 
     fun addRoom(room: Room): Room {
-        roomDatabase[room.roomNumber] = room
-        return room
+        return roomDAO.saveRoom(room)
     }
 
     fun findRooms(reservationRequest: ReservationRequest): Set<Room> {
@@ -27,7 +24,8 @@ class RoomService(
         reservationRequest: ReservationRequest,
         allowRoomsWithAmenities: Boolean = false
     ): Set<Room> {
-        return roomDatabase.values
+        return getAllRooms()
+            .asSequence()
             .filter { it.numberOfBeds == reservationRequest.numberOfBeds }
             .filter {
                 when {

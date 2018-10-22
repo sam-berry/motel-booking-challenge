@@ -13,4 +13,11 @@ data class ReservationRequest(
         if (!checkOutDate.isAfter(checkInDate))
             throw InvalidCheckOutDateException(this)
     }
+
+    fun toReservation(): Reservation {
+        return Reservation(
+            startDate = checkInDate,
+            endDate = checkOutDate.minusDays(1)
+        )
+    }
 }

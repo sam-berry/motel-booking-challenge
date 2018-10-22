@@ -8,6 +8,7 @@ class AddNewRoomTest {
     private lateinit var baseRoom: Room
 
     private lateinit var roomDatabase: MutableMap<String, Room>
+    private lateinit var roomDAO: RoomDAO
     private lateinit var roomService: RoomService
 
     @Before
@@ -19,7 +20,8 @@ class AddNewRoomTest {
         )
 
         roomDatabase = mutableMapOf()
-        roomService = RoomService(roomDatabase)
+        roomDAO = RoomDAO(roomDatabase)
+        roomService = RoomService(roomDAO)
     }
 
     private fun verifyRoom(actual: Room, expected: Room) {
