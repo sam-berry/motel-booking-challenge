@@ -2,7 +2,7 @@
 
 ## Overview
 
-This solution utilizes the following technologies in order to provide a booking system:
+See [Design Notes](https://github.com/sam-berry/motel-booking-challenge/blob/master/design-notes.md) for the requirements of this programming challenge. This solution utilizes the following technologies in order to provide a booking system:
 * Kotlin
 * Spring Boot
 * Spring Shell
