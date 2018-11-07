@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.samberry</groupId>
-	<artifactId>bravo-programming-challenge</artifactId>
+	<artifactId>motel-booking-challenge</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>bravo-programming-challenge</name>
+	<name>motel-booking-challenge</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

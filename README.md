@@ -1,4 +1,4 @@
-# Bravo Programming Challenge - Booking System
+# Programming Challenge - Motel Booking System
 
 ## Overview
 
@@ -20,7 +20,8 @@ A command is available to set up an example customer, complete with a two-story 
 
 *Note: Once the shell is running, the `help` command can be run to see all available APIs*
 
-1. Run `./mvnw clean install && java -jar target/bravo-programming-challenge-1.0.jar` to build and run the shell application
+1. Run `./mvnw clean install && java -jar target/motel-booking-challenge-1.0.jar`        
+ to build and run the shell application 
 2. Once you are presented with `shell:>` run `setup-customer-motel`
 
 Now the system is ready to start taking reservations.
